@@ -9,6 +9,7 @@ from app.core.config import settings
 from app.db.session import get_db
 from app.middleware.auth import get_current_active_user
 from app.models.horoscope import Horoscope
+from app.models.subscription import SubscriptionPlan, UserSubscription
 from app.models.user import User
 from app.schemas.horoscope import HoroscopeCreate, HoroscopeResponse, HoroscopeUpdate
 
@@ -116,7 +117,27 @@ async def get_user_horoscope(
     db: AsyncSession = Depends(get_db),
     current_user: User = Depends(get_current_active_user),
 ):
-    """Get another user's horoscope (requires subscription)."""
+    """Get another user's horoscope (requires subscription with horoscope access)."""
+    # Verify subscription allows horoscope viewing
+    sub_result = await db.execute(
+        select(UserSubscription).where(UserSubscription.user_id == current_user.id)
+    )
+    subscription = sub_result.scalar_one_or_none()
+    if not subscription or not subscription.is_active:
+        raise HTTPException(
+            status_code=403, detail="Active subscription required to view horoscopes"
+        )
+
+    plan_result = await db.execute(
+        select(SubscriptionPlan).where(SubscriptionPlan.id == subscription.plan_id)
+    )
+    plan = plan_result.scalar_one_or_none()
+    if not plan or not plan.can_see_horoscope:
+        raise HTTPException(
+            status_code=403,
+            detail="Your subscription plan does not include horoscope access",
+        )
+
     result = await db.execute(select(Horoscope).where(Horoscope.user_id == user_id))
     horoscope = result.scalar_one_or_none()
     if not horoscope:

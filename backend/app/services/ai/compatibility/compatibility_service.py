@@ -131,7 +131,7 @@ class CompatibilityService:
             model_version="v1.0",
         )
         db.add(ai_score)
-        await db.commit()
+        await db.flush()
 
         return CompatibilityResult(
             user1_id=user1_id,

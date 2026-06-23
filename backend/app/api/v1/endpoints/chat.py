@@ -11,6 +11,7 @@ from fastapi import (
 from sqlalchemy import and_, func, or_, select, update
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from app.core.security import verify_token
 from app.db.session import get_db
 from app.middleware.auth import get_current_active_user
 from app.models.chat import ChatMessage, ChatRoom, ChatRoomStatus
@@ -215,8 +216,18 @@ async def send_message(
 
 
 @router.websocket("/ws/{room_id}")
-async def websocket_endpoint(websocket: WebSocket, room_id: str):
-    """WebSocket for real-time chat."""
+async def websocket_endpoint(
+    websocket: WebSocket, room_id: str, token: str = Query(default="")
+):
+    """WebSocket for real-time chat (requires token query param for auth)."""
+    if not token:
+        await websocket.close(code=4001, reason="Authentication required")
+        return
+    payload = verify_token(token, "access")
+    if not payload:
+        await websocket.close(code=4001, reason="Invalid token")
+        return
+
     await manager.connect(websocket, room_id)
     try:
         while True:
