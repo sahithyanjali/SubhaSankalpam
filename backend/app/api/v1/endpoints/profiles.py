@@ -27,7 +27,9 @@ async def create_profile(
     current_user: User = Depends(get_current_active_user),
 ):
     """Create user profile with personal, professional, and lifestyle details."""
-    existing = await db.execute(select(Profile).where(Profile.user_id == current_user.id))
+    existing = await db.execute(
+        select(Profile).where(Profile.user_id == current_user.id)
+    )
     if existing.scalar_one_or_none():
         raise HTTPException(status_code=400, detail="Profile already exists")
 
@@ -95,7 +97,10 @@ async def get_profile(
     """Get a specific user's profile."""
     result = await db.execute(
         select(Profile).where(
-            and_(Profile.user_id == user_id, Profile.approval_status == ProfileApprovalStatus.APPROVED)
+            and_(
+                Profile.user_id == user_id,
+                Profile.approval_status == ProfileApprovalStatus.APPROVED,
+            )
         )
     )
     profile = result.scalar_one_or_none()
@@ -179,11 +184,26 @@ def _calculate_completeness(profile: Profile) -> int:
     total = 20
     filled = 0
     fields = [
-        profile.first_name, profile.last_name, profile.gender, profile.date_of_birth,
-        profile.height_cm, profile.marital_status, profile.religion, profile.caste,
-        profile.education, profile.occupation, profile.annual_income, profile.city,
-        profile.state, profile.about_me, profile.eating_habit, profile.father_occupation,
-        profile.languages, profile.gothram, profile.weight_kg, profile.institution,
+        profile.first_name,
+        profile.last_name,
+        profile.gender,
+        profile.date_of_birth,
+        profile.height_cm,
+        profile.marital_status,
+        profile.religion,
+        profile.caste,
+        profile.education,
+        profile.occupation,
+        profile.annual_income,
+        profile.city,
+        profile.state,
+        profile.about_me,
+        profile.eating_habit,
+        profile.father_occupation,
+        profile.languages,
+        profile.gothram,
+        profile.weight_kg,
+        profile.institution,
     ]
     filled = sum(1 for f in fields if f)
     return min(int((filled / total) * 100), 100)

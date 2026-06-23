@@ -19,7 +19,9 @@ from app.schemas.ai import (
 from app.services.ai.chat_assistant.assistant_service import chat_assistant_service
 from app.services.ai.compatibility.compatibility_service import compatibility_service
 from app.services.ai.fraud.fraud_service import fraud_service
-from app.services.ai.recommendations.recommendation_service import recommendation_service
+from app.services.ai.recommendations.recommendation_service import (
+    recommendation_service,
+)
 from app.services.ai.verification.verification_service import verification_service
 
 router = APIRouter(prefix="/ai", tags=["AI Intelligence"])
@@ -109,7 +111,9 @@ async def chat_with_assistant(
     current_user: User = Depends(get_current_active_user),
 ):
     """AI chat assistant: find matches, improve profile, explain compatibility, horoscope insights."""
-    return await chat_assistant_service.chat(db, current_user.id, request.query, request.context)
+    return await chat_assistant_service.chat(
+        db, current_user.id, request.query, request.context
+    )
 
 
 # --- Profile Improvement Suggestions ---

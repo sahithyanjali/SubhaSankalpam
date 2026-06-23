@@ -4,7 +4,9 @@ from pydantic import BaseModel, EmailStr, Field
 
 
 class OTPRequest(BaseModel):
-    phone: str = Field(..., pattern=r"^\+?[1-9]\d{9,14}$", description="Phone number with country code")
+    phone: str = Field(
+        ..., pattern=r"^\+?[1-9]\d{9,14}$", description="Phone number with country code"
+    )
 
 
 class OTPVerify(BaseModel):

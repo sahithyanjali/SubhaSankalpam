@@ -68,7 +68,12 @@ class Profile(Base):
     __tablename__ = "profiles"
 
     id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
-    user_id = Column(UUID(as_uuid=True), ForeignKey("users.id", ondelete="CASCADE"), unique=True, nullable=False)
+    user_id = Column(
+        UUID(as_uuid=True),
+        ForeignKey("users.id", ondelete="CASCADE"),
+        unique=True,
+        nullable=False,
+    )
 
     # Personal Information
     first_name = Column(String(100), nullable=False)
@@ -121,11 +126,15 @@ class Profile(Base):
     languages = Column(Text, nullable=True)  # JSON array stored as text
 
     # Admin
-    approval_status = Column(Enum(ProfileApprovalStatus), default=ProfileApprovalStatus.PENDING)
+    approval_status = Column(
+        Enum(ProfileApprovalStatus), default=ProfileApprovalStatus.PENDING
+    )
     admin_notes = Column(Text, nullable=True)
     profile_completeness = Column(Integer, default=0)
 
-    created_at = Column(DateTime(timezone=True), default=lambda: datetime.now(timezone.utc))
+    created_at = Column(
+        DateTime(timezone=True), default=lambda: datetime.now(timezone.utc)
+    )
     updated_at = Column(
         DateTime(timezone=True),
         default=lambda: datetime.now(timezone.utc),

@@ -51,7 +51,9 @@ class User(Base):
     last_login = Column(DateTime(timezone=True), nullable=True)
     last_active = Column(DateTime(timezone=True), nullable=True)
     device_token = Column(Text, nullable=True)
-    created_at = Column(DateTime(timezone=True), default=lambda: datetime.now(timezone.utc))
+    created_at = Column(
+        DateTime(timezone=True), default=lambda: datetime.now(timezone.utc)
+    )
     updated_at = Column(
         DateTime(timezone=True),
         default=lambda: datetime.now(timezone.utc),
@@ -59,15 +61,43 @@ class User(Base):
     )
 
     # Relationships
-    profile = relationship("Profile", back_populates="user", uselist=False, cascade="all, delete-orphan")
-    horoscope = relationship("Horoscope", back_populates="user", uselist=False, cascade="all, delete-orphan")
+    profile = relationship(
+        "Profile", back_populates="user", uselist=False, cascade="all, delete-orphan"
+    )
+    horoscope = relationship(
+        "Horoscope", back_populates="user", uselist=False, cascade="all, delete-orphan"
+    )
     photos = relationship("Photo", back_populates="user", cascade="all, delete-orphan")
-    verification = relationship("Verification", back_populates="user", uselist=False, cascade="all, delete-orphan")
-    user_interests = relationship("UserInterest", back_populates="user", cascade="all, delete-orphan")
-    sent_matches = relationship("Match", foreign_keys="Match.sender_id", back_populates="sender")
-    received_matches = relationship("Match", foreign_keys="Match.receiver_id", back_populates="receiver")
-    notifications = relationship("Notification", back_populates="user", cascade="all, delete-orphan")
-    subscription = relationship("UserSubscription", back_populates="user", uselist=False, cascade="all, delete-orphan")
-    fraud_alerts = relationship("FraudAlert", back_populates="user", cascade="all, delete-orphan")
-    ai_scores = relationship("AIScore", back_populates="user", cascade="all, delete-orphan")
-    audit_logs = relationship("AuditLog", back_populates="user", cascade="all, delete-orphan")
+    verification = relationship(
+        "Verification",
+        back_populates="user",
+        uselist=False,
+        cascade="all, delete-orphan",
+    )
+    user_interests = relationship(
+        "UserInterest", back_populates="user", cascade="all, delete-orphan"
+    )
+    sent_matches = relationship(
+        "Match", foreign_keys="Match.sender_id", back_populates="sender"
+    )
+    received_matches = relationship(
+        "Match", foreign_keys="Match.receiver_id", back_populates="receiver"
+    )
+    notifications = relationship(
+        "Notification", back_populates="user", cascade="all, delete-orphan"
+    )
+    subscription = relationship(
+        "UserSubscription",
+        back_populates="user",
+        uselist=False,
+        cascade="all, delete-orphan",
+    )
+    fraud_alerts = relationship(
+        "FraudAlert", back_populates="user", cascade="all, delete-orphan"
+    )
+    ai_scores = relationship(
+        "AIScore", back_populates="user", cascade="all, delete-orphan"
+    )
+    audit_logs = relationship(
+        "AuditLog", back_populates="user", cascade="all, delete-orphan"
+    )

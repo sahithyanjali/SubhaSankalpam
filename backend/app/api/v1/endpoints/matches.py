@@ -10,12 +10,19 @@ from app.middleware.auth import get_current_active_user
 from app.models.match import Match, MatchStatus
 from app.models.notification import Notification, NotificationType
 from app.models.user import User
-from app.schemas.match import MatchListResponse, MatchResponse, RespondInterest, SendInterest
+from app.schemas.match import (
+    MatchListResponse,
+    MatchResponse,
+    RespondInterest,
+    SendInterest,
+)
 
 router = APIRouter(prefix="/matches", tags=["Matches & Interests"])
 
 
-@router.post("/send-interest", response_model=MatchResponse, status_code=status.HTTP_201_CREATED)
+@router.post(
+    "/send-interest", response_model=MatchResponse, status_code=status.HTTP_201_CREATED
+)
 async def send_interest(
     data: SendInterest,
     db: AsyncSession = Depends(get_db),
@@ -28,14 +35,19 @@ async def send_interest(
     # Check if already sent
     existing = await db.execute(
         select(Match).where(
-            and_(Match.sender_id == current_user.id, Match.receiver_id == data.receiver_id)
+            and_(
+                Match.sender_id == current_user.id,
+                Match.receiver_id == data.receiver_id,
+            )
         )
     )
     if existing.scalar_one_or_none():
         raise HTTPException(status_code=400, detail="Interest already sent")
 
     # Calculate compatibility score
-    from app.services.ai.compatibility.compatibility_service import compatibility_service
+    from app.services.ai.compatibility.compatibility_service import (
+        compatibility_service,
+    )
 
     try:
         compat = await compatibility_service.calculate_compatibility(
@@ -145,7 +157,9 @@ async def get_sent_interests(
     )
     matches = result.scalars().all()
 
-    return MatchListResponse(matches=matches, total=total, page=page, page_size=page_size)
+    return MatchListResponse(
+        matches=matches, total=total, page=page, page_size=page_size
+    )
 
 
 @router.get("/received", response_model=MatchListResponse)
@@ -170,4 +184,6 @@ async def get_received_interests(
     )
     matches = result.scalars().all()
 
-    return MatchListResponse(matches=matches, total=total, page=page, page_size=page_size)
+    return MatchListResponse(
+        matches=matches, total=total, page=page, page_size=page_size
+    )

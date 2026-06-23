@@ -17,7 +17,9 @@ class VerificationService:
 
     @staticmethod
     async def verify_profile(db: AsyncSession, user_id: UUID) -> VerificationResult:
-        result = await db.execute(select(Verification).where(Verification.user_id == user_id))
+        result = await db.execute(
+            select(Verification).where(Verification.user_id == user_id)
+        )
         verification = result.scalar_one_or_none()
 
         if verification is None:
@@ -41,7 +43,9 @@ class VerificationService:
         verification.trust_score = trust_score
         verification.identity_consistency = identity_consistency
         verification.verification_status = (
-            VerificationStatus.VERIFIED if is_verified else VerificationStatus.MANUAL_REVIEW
+            VerificationStatus.VERIFIED
+            if is_verified
+            else VerificationStatus.MANUAL_REVIEW
         )
 
         # Update user verified badge
@@ -56,11 +60,13 @@ class VerificationService:
             user_id=user_id,
             score_type=AIScoreType.VERIFICATION,
             score=verification_score,
-            details=json.dumps({
-                "verification_score": verification_score,
-                "trust_score": trust_score,
-                "identity_consistency": identity_consistency,
-            }),
+            details=json.dumps(
+                {
+                    "verification_score": verification_score,
+                    "trust_score": trust_score,
+                    "identity_consistency": identity_consistency,
+                }
+            ),
             model_version="v1.0",
         )
         db.add(ai_score)
@@ -75,7 +81,9 @@ class VerificationService:
         )
 
     @staticmethod
-    async def _compare_faces(selfie_url: Optional[str], profile_photo_url: Optional[str]) -> float:
+    async def _compare_faces(
+        selfie_url: Optional[str], profile_photo_url: Optional[str]
+    ) -> float:
         """Compare selfie with profile photo using AI."""
         if not selfie_url or not profile_photo_url:
             return 0.0
@@ -87,13 +95,15 @@ class VerificationService:
                 genai.configure(api_key=settings.GOOGLE_AI_API_KEY)
                 model = genai.GenerativeModel("gemini-1.5-flash")
 
-                response = model.generate_content([
-                    "Compare these two facial images and return a similarity score from 0 to 100. "
-                    "Consider facial features, structure, and identity consistency. "
-                    "Return ONLY a number between 0 and 100.",
-                    f"Selfie URL: {selfie_url}",
-                    f"Profile Photo URL: {profile_photo_url}",
-                ])
+                response = model.generate_content(
+                    [
+                        "Compare these two facial images and return a similarity score from 0 to 100. "
+                        "Consider facial features, structure, and identity consistency. "
+                        "Return ONLY a number between 0 and 100.",
+                        f"Selfie URL: {selfie_url}",
+                        f"Profile Photo URL: {profile_photo_url}",
+                    ]
+                )
                 score = float(response.text.strip())
                 return min(max(score, 0), 100)
         except Exception:
@@ -111,7 +121,9 @@ class VerificationService:
         score = 50.0  # Base score
 
         # Check profile completeness
-        profile_result = await db.execute(select(Profile).where(Profile.user_id == user_id))
+        profile_result = await db.execute(
+            select(Profile).where(Profile.user_id == user_id)
+        )
         profile = profile_result.scalar_one_or_none()
         if profile:
             if profile.education:

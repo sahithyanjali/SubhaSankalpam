@@ -23,13 +23,17 @@ class AIScore(Base):
     __tablename__ = "ai_scores"
 
     id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
-    user_id = Column(UUID(as_uuid=True), ForeignKey("users.id", ondelete="CASCADE"), nullable=False)
+    user_id = Column(
+        UUID(as_uuid=True), ForeignKey("users.id", ondelete="CASCADE"), nullable=False
+    )
 
     score_type = Column(Enum(AIScoreType), nullable=False)
     score = Column(Float, nullable=False)
     details = Column(Text, nullable=True)  # JSON with breakdown
     model_version = Column(Text, nullable=True)
 
-    created_at = Column(DateTime(timezone=True), default=lambda: datetime.now(timezone.utc))
+    created_at = Column(
+        DateTime(timezone=True), default=lambda: datetime.now(timezone.utc)
+    )
 
     user = relationship("User", back_populates="ai_scores")

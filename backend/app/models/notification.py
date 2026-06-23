@@ -27,7 +27,9 @@ class Notification(Base):
     __tablename__ = "notifications"
 
     id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
-    user_id = Column(UUID(as_uuid=True), ForeignKey("users.id", ondelete="CASCADE"), nullable=False)
+    user_id = Column(
+        UUID(as_uuid=True), ForeignKey("users.id", ondelete="CASCADE"), nullable=False
+    )
 
     notification_type = Column(Enum(NotificationType), nullable=False)
     title = Column(String(255), nullable=False)
@@ -36,6 +38,8 @@ class Notification(Base):
     is_read = Column(Boolean, default=False)
     is_pushed = Column(Boolean, default=False)
 
-    created_at = Column(DateTime(timezone=True), default=lambda: datetime.now(timezone.utc))
+    created_at = Column(
+        DateTime(timezone=True), default=lambda: datetime.now(timezone.utc)
+    )
 
     user = relationship("User", back_populates="notifications")

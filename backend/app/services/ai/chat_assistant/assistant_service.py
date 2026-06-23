@@ -30,7 +30,9 @@ Keep responses concise and actionable."""
         db: AsyncSession, user_id: UUID, query: str, context: Optional[str] = None
     ) -> ChatAssistantResponse:
         # Get user profile for context
-        profile_result = await db.execute(select(Profile).where(Profile.user_id == user_id))
+        profile_result = await db.execute(
+            select(Profile).where(Profile.user_id == user_id)
+        )
         profile = profile_result.scalar_one_or_none()
 
         user_context = ""
@@ -41,7 +43,9 @@ Education: {profile.education}, Location: {profile.city}, {profile.state},
 Religion: {profile.religion}, Caste: {profile.caste}"""
 
         # Try Gemini first, then OpenAI
-        response_text = await ChatAssistantService._get_ai_response(query, user_context, context)
+        response_text = await ChatAssistantService._get_ai_response(
+            query, user_context, context
+        )
 
         suggestions = ChatAssistantService._generate_suggestions(query)
 
@@ -54,7 +58,9 @@ Religion: {profile.religion}, Caste: {profile.caste}"""
     async def get_profile_suggestions(
         db: AsyncSession, user_id: UUID
     ) -> ProfileImprovementSuggestion:
-        profile_result = await db.execute(select(Profile).where(Profile.user_id == user_id))
+        profile_result = await db.execute(
+            select(Profile).where(Profile.user_id == user_id)
+        )
         profile = profile_result.scalar_one_or_none()
 
         suggestions = []
@@ -87,7 +93,12 @@ Religion: {profile.religion}, Caste: {profile.caste}"""
                         areas.append(area)
 
             # Count other filled fields
-            basic_fields = [profile.first_name, profile.last_name, profile.gender, profile.date_of_birth]
+            basic_fields = [
+                profile.first_name,
+                profile.last_name,
+                profile.gender,
+                profile.date_of_birth,
+            ]
             filled += sum(1 for f in basic_fields if f)
             filled += 1  # always have user_id
 
@@ -95,7 +106,9 @@ Religion: {profile.religion}, Caste: {profile.caste}"""
 
             # AI-powered suggestions
             if settings.GOOGLE_AI_API_KEY:
-                ai_suggestions = await ChatAssistantService._get_ai_profile_tips(profile)
+                ai_suggestions = await ChatAssistantService._get_ai_profile_tips(
+                    profile
+                )
                 suggestions.extend(ai_suggestions)
         else:
             suggestions = ["Create your profile to get started"]
@@ -110,7 +123,9 @@ Religion: {profile.religion}, Caste: {profile.caste}"""
         )
 
     @staticmethod
-    async def _get_ai_response(query: str, user_context: str, extra_context: Optional[str]) -> str:
+    async def _get_ai_response(
+        query: str, user_context: str, extra_context: Optional[str]
+    ) -> str:
         full_context = f"{user_context}\n{extra_context or ''}"
 
         # Try Gemini
@@ -143,8 +158,14 @@ Provide a helpful, concise response."""
                 response = client.chat.completions.create(
                     model="gpt-4o-mini",
                     messages=[
-                        {"role": "system", "content": ChatAssistantService.SYSTEM_PROMPT},
-                        {"role": "user", "content": f"Context: {full_context}\n\nQuery: {query}"},
+                        {
+                            "role": "system",
+                            "content": ChatAssistantService.SYSTEM_PROMPT,
+                        },
+                        {
+                            "role": "user",
+                            "content": f"Context: {full_context}\n\nQuery: {query}",
+                        },
                     ],
                     max_tokens=500,
                 )
@@ -159,24 +180,34 @@ Provide a helpful, concise response."""
     def _fallback_response(query: str) -> str:
         query_lower = query.lower()
         if "match" in query_lower or "find" in query_lower:
-            return ("Use our search filters to find compatible matches. "
-                    "You can filter by age, caste, education, location, and more. "
-                    "Check your daily AI recommendations for personalized suggestions.")
+            return (
+                "Use our search filters to find compatible matches. "
+                "You can filter by age, caste, education, location, and more. "
+                "Check your daily AI recommendations for personalized suggestions."
+            )
         elif "profile" in query_lower or "improve" in query_lower:
-            return ("To improve your profile: add a detailed 'About Me', upload multiple photos, "
-                    "complete all sections including education, occupation, and horoscope details. "
-                    "A complete profile gets 5x more interest requests.")
+            return (
+                "To improve your profile: add a detailed 'About Me', upload multiple photos, "
+                "complete all sections including education, occupation, and horoscope details. "
+                "A complete profile gets 5x more interest requests."
+            )
         elif "compatibility" in query_lower or "score" in query_lower:
-            return ("Our compatibility score considers: religion, caste, education, location, "
-                    "lifestyle, interests, age, and horoscope matching. "
-                    "Scores above 70% indicate strong compatibility.")
+            return (
+                "Our compatibility score considers: religion, caste, education, location, "
+                "lifestyle, interests, age, and horoscope matching. "
+                "Scores above 70% indicate strong compatibility."
+            )
         elif "horoscope" in query_lower:
-            return ("Upload your horoscope PDF and fill in Nakshatra, Rasi, and Gothram details. "
-                    "Our AI matches horoscopes based on traditional Telugu astrological compatibility. "
-                    "Same Gothram matches are flagged as per tradition.")
-        return ("I'm your SubhaSankalpam AI assistant. I can help you find matches, "
-                "improve your profile, explain compatibility, and provide horoscope insights. "
-                "What would you like to know?")
+            return (
+                "Upload your horoscope PDF and fill in Nakshatra, Rasi, and Gothram details. "
+                "Our AI matches horoscopes based on traditional Telugu astrological compatibility. "
+                "Same Gothram matches are flagged as per tradition."
+            )
+        return (
+            "I'm your SubhaSankalpam AI assistant. I can help you find matches, "
+            "improve your profile, explain compatibility, and provide horoscope insights. "
+            "What would you like to know?"
+        )
 
     @staticmethod
     def _generate_suggestions(query: str) -> list[str]:

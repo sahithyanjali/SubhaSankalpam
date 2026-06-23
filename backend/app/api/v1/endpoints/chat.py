@@ -1,6 +1,13 @@
 from uuid import UUID
 
-from fastapi import APIRouter, Depends, HTTPException, Query, WebSocket, WebSocketDisconnect
+from fastapi import (
+    APIRouter,
+    Depends,
+    HTTPException,
+    Query,
+    WebSocket,
+    WebSocketDisconnect,
+)
 from sqlalchemy import and_, func, or_, select, update
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -50,9 +57,14 @@ async def get_chat_rooms(
 ):
     """Get all chat rooms for the current user."""
     result = await db.execute(
-        select(ChatRoom).where(
-            or_(ChatRoom.user1_id == current_user.id, ChatRoom.user2_id == current_user.id)
-        ).order_by(ChatRoom.updated_at.desc())
+        select(ChatRoom)
+        .where(
+            or_(
+                ChatRoom.user1_id == current_user.id,
+                ChatRoom.user2_id == current_user.id,
+            )
+        )
+        .order_by(ChatRoom.updated_at.desc())
     )
     rooms = result.scalars().all()
 
@@ -105,7 +117,9 @@ async def get_messages(
     # Verify user is in the room
     room_result = await db.execute(select(ChatRoom).where(ChatRoom.id == room_id))
     room = room_result.scalar_one_or_none()
-    if not room or (room.user1_id != current_user.id and room.user2_id != current_user.id):
+    if not room or (
+        room.user1_id != current_user.id and room.user2_id != current_user.id
+    ):
         raise HTTPException(status_code=403, detail="Access denied")
 
     # Mark messages as read
@@ -156,7 +170,9 @@ async def send_message(
     """Send a message in a chat room."""
     room_result = await db.execute(select(ChatRoom).where(ChatRoom.id == room_id))
     room = room_result.scalar_one_or_none()
-    if not room or (room.user1_id != current_user.id and room.user2_id != current_user.id):
+    if not room or (
+        room.user1_id != current_user.id and room.user2_id != current_user.id
+    ):
         raise HTTPException(status_code=403, detail="Access denied")
 
     if room.status != ChatRoomStatus.ACTIVE:

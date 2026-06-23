@@ -22,7 +22,9 @@ async def send_otp(request: OTPRequest):
     """Send OTP to mobile number for login/registration."""
     await otp_service.send_otp(request.phone)
     # In production, don't return OTP
-    return MessageResponse(message=f"OTP sent successfully to {request.phone}", success=True)
+    return MessageResponse(
+        message=f"OTP sent successfully to {request.phone}", success=True
+    )
 
 
 @router.post("/otp/verify", response_model=TokenResponse)
@@ -43,7 +45,9 @@ async def verify_otp(request: OTPVerify, db: AsyncSession = Depends(get_db)):
 @router.post("/register", response_model=TokenResponse)
 async def register(request: RegisterRequest, db: AsyncSession = Depends(get_db)):
     """Register a new user after OTP verification."""
-    user = await auth_service.get_or_create_user_by_phone(db, request.phone, request.profile_for)
+    user = await auth_service.get_or_create_user_by_phone(
+        db, request.phone, request.profile_for
+    )
 
     if request.email:
         user.email = request.email
@@ -68,7 +72,9 @@ async def login_email(request: EmailLogin, db: AsyncSession = Depends(get_db)):
 
 
 @router.post("/token/refresh", response_model=TokenResponse)
-async def refresh_token(request: RefreshTokenRequest, db: AsyncSession = Depends(get_db)):
+async def refresh_token(
+    request: RefreshTokenRequest, db: AsyncSession = Depends(get_db)
+):
     """Refresh access token using refresh token."""
     tokens = await auth_service.refresh_access_token(db, request.refresh_token)
     if tokens is None:

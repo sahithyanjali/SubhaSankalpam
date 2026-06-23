@@ -58,13 +58,25 @@ class CompatibilityService:
 
         # Calculate individual scores
         age_score = CompatibilityService._age_compatibility(profile1, profile2)
-        education_score = CompatibilityService._education_compatibility(profile1, profile2)
-        location_score = CompatibilityService._location_compatibility(profile1, profile2)
-        religion_score = CompatibilityService._religion_compatibility(profile1, profile2)
+        education_score = CompatibilityService._education_compatibility(
+            profile1, profile2
+        )
+        location_score = CompatibilityService._location_compatibility(
+            profile1, profile2
+        )
+        religion_score = CompatibilityService._religion_compatibility(
+            profile1, profile2
+        )
         caste_score = CompatibilityService._caste_compatibility(profile1, profile2)
-        lifestyle_score = CompatibilityService._lifestyle_compatibility(profile1, profile2)
-        interests_score = await CompatibilityService._interests_compatibility(db, user1_id, user2_id)
-        horoscope_score = await CompatibilityService._horoscope_compatibility(db, user1_id, user2_id)
+        lifestyle_score = CompatibilityService._lifestyle_compatibility(
+            profile1, profile2
+        )
+        interests_score = await CompatibilityService._interests_compatibility(
+            db, user1_id, user2_id
+        )
+        horoscope_score = await CompatibilityService._horoscope_compatibility(
+            db, user1_id, user2_id
+        )
 
         # Weighted overall score
         weights = {
@@ -91,7 +103,9 @@ class CompatibilityService:
 
         # Optionally enhance with Gemini AI
         if settings.GOOGLE_AI_API_KEY:
-            ai_adjustment = await CompatibilityService._ai_enhance_score(profile1, profile2, overall_score)
+            ai_adjustment = await CompatibilityService._ai_enhance_score(
+                profile1, profile2, overall_score
+            )
             overall_score = (overall_score * 0.7) + (ai_adjustment * 0.3)
 
         overall_score = round(min(max(overall_score, 0), 100), 1)
@@ -101,17 +115,19 @@ class CompatibilityService:
             user_id=user1_id,
             score_type=AIScoreType.COMPATIBILITY,
             score=overall_score,
-            details=json.dumps({
-                "target_user_id": str(user2_id),
-                "age": age_score,
-                "education": education_score,
-                "location": location_score,
-                "religion": religion_score,
-                "caste": caste_score,
-                "lifestyle": lifestyle_score,
-                "interests": interests_score,
-                "horoscope": horoscope_score,
-            }),
+            details=json.dumps(
+                {
+                    "target_user_id": str(user2_id),
+                    "age": age_score,
+                    "education": education_score,
+                    "location": location_score,
+                    "religion": religion_score,
+                    "caste": caste_score,
+                    "lifestyle": lifestyle_score,
+                    "interests": interests_score,
+                    "horoscope": horoscope_score,
+                }
+            ),
             model_version="v1.0",
         )
         db.add(ai_score)
@@ -152,12 +168,23 @@ class CompatibilityService:
             return 50.0
 
         edu_levels = {
-            "phd": 6, "doctorate": 6,
-            "masters": 5, "mtech": 5, "mba": 5, "ms": 5,
-            "bachelors": 4, "btech": 4, "be": 4, "bsc": 4, "bcom": 4, "ba": 4,
+            "phd": 6,
+            "doctorate": 6,
+            "masters": 5,
+            "mtech": 5,
+            "mba": 5,
+            "ms": 5,
+            "bachelors": 4,
+            "btech": 4,
+            "be": 4,
+            "bsc": 4,
+            "bcom": 4,
+            "ba": 4,
             "diploma": 3,
-            "intermediate": 2, "12th": 2,
-            "ssc": 1, "10th": 1,
+            "intermediate": 2,
+            "12th": 2,
+            "ssc": 1,
+            "10th": 1,
         }
 
         level1 = 3  # default
@@ -209,7 +236,11 @@ class CompatibilityService:
             return 50.0
         if p1.caste.lower() == p2.caste.lower():
             score = 90.0
-            if p1.sub_caste and p2.sub_caste and p1.sub_caste.lower() == p2.sub_caste.lower():
+            if (
+                p1.sub_caste
+                and p2.sub_caste
+                and p1.sub_caste.lower() == p2.sub_caste.lower()
+            ):
                 score = 100.0
             return score
         if p1.willing_intercaste or p2.willing_intercaste:
@@ -243,9 +274,15 @@ class CompatibilityService:
         return score
 
     @staticmethod
-    async def _interests_compatibility(db: AsyncSession, user1_id: UUID, user2_id: UUID) -> float:
-        r1 = await db.execute(select(UserInterest).where(UserInterest.user_id == user1_id))
-        r2 = await db.execute(select(UserInterest).where(UserInterest.user_id == user2_id))
+    async def _interests_compatibility(
+        db: AsyncSession, user1_id: UUID, user2_id: UUID
+    ) -> float:
+        r1 = await db.execute(
+            select(UserInterest).where(UserInterest.user_id == user1_id)
+        )
+        r2 = await db.execute(
+            select(UserInterest).where(UserInterest.user_id == user2_id)
+        )
         interests1 = {ui.interest_id for ui in r1.scalars().all()}
         interests2 = {ui.interest_id for ui in r2.scalars().all()}
 
@@ -261,9 +298,15 @@ class CompatibilityService:
         return (len(common) / len(total)) * 100
 
     @staticmethod
-    async def _horoscope_compatibility(db: AsyncSession, user1_id: UUID, user2_id: UUID) -> float:
-        h1_result = await db.execute(select(Horoscope).where(Horoscope.user_id == user1_id))
-        h2_result = await db.execute(select(Horoscope).where(Horoscope.user_id == user2_id))
+    async def _horoscope_compatibility(
+        db: AsyncSession, user1_id: UUID, user2_id: UUID
+    ) -> float:
+        h1_result = await db.execute(
+            select(Horoscope).where(Horoscope.user_id == user1_id)
+        )
+        h2_result = await db.execute(
+            select(Horoscope).where(Horoscope.user_id == user2_id)
+        )
         h1 = h1_result.scalar_one_or_none()
         h2 = h2_result.scalar_one_or_none()
 

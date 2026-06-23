@@ -24,11 +24,16 @@ async def upload_photo(
 ):
     """Upload profile, gallery, family, or selfie photo."""
     if file.content_type not in settings.ALLOWED_PHOTO_TYPES:
-        raise HTTPException(status_code=400, detail="Invalid file type. Use JPEG, PNG, or WebP")
+        raise HTTPException(
+            status_code=400, detail="Invalid file type. Use JPEG, PNG, or WebP"
+        )
 
     content = await file.read()
     if len(content) > settings.MAX_PHOTO_SIZE_MB * 1024 * 1024:
-        raise HTTPException(status_code=400, detail=f"File too large. Max {settings.MAX_PHOTO_SIZE_MB}MB")
+        raise HTTPException(
+            status_code=400,
+            detail=f"File too large. Max {settings.MAX_PHOTO_SIZE_MB}MB",
+        )
 
     # Save file
     upload_dir = os.path.join(settings.UPLOAD_DIR, "photos", str(current_user.id))
@@ -40,7 +45,9 @@ async def upload_photo(
 
     # Determine if primary
     existing = await db.execute(
-        select(Photo).where(Photo.user_id == current_user.id, Photo.photo_type == PhotoType.PROFILE)
+        select(Photo).where(
+            Photo.user_id == current_user.id, Photo.photo_type == PhotoType.PROFILE
+        )
     )
     is_primary = photo_type == "profile" and existing.scalar_one_or_none() is None
 
@@ -54,7 +61,11 @@ async def upload_photo(
     await db.commit()
     await db.refresh(photo)
 
-    return {"id": str(photo.id), "file_url": photo.file_url, "photo_type": photo.photo_type.value}
+    return {
+        "id": str(photo.id),
+        "file_url": photo.file_url,
+        "photo_type": photo.photo_type.value,
+    }
 
 
 @router.get("/my-photos")
@@ -64,7 +75,9 @@ async def get_my_photos(
 ):
     """Get all photos for current user."""
     result = await db.execute(
-        select(Photo).where(Photo.user_id == current_user.id).order_by(Photo.display_order)
+        select(Photo)
+        .where(Photo.user_id == current_user.id)
+        .order_by(Photo.display_order)
     )
     photos = result.scalars().all()
     return {
@@ -131,7 +144,9 @@ async def selfie_verification(
     profile_photo = profile_photo_result.scalar_one_or_none()
 
     # Create/update verification record
-    ver_result = await db.execute(select(Verification).where(Verification.user_id == current_user.id))
+    ver_result = await db.execute(
+        select(Verification).where(Verification.user_id == current_user.id)
+    )
     verification = ver_result.scalar_one_or_none()
 
     if not verification:
@@ -158,5 +173,7 @@ async def selfie_verification(
         "verification_score": result.verification_score,
         "trust_score": result.trust_score,
         "is_verified": result.is_verified,
-        "message": "Verified! Badge granted." if result.is_verified else "Verification pending manual review.",
+        "message": "Verified! Badge granted."
+        if result.is_verified
+        else "Verification pending manual review.",
     }

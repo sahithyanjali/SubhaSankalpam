@@ -23,9 +23,15 @@ class FraudDetectionService:
             raise ValueError("User not found")
 
         # Run all detection checks
-        duplicate_photos = await FraudDetectionService._check_duplicate_photos(db, user_id)
-        duplicate_phone = await FraudDetectionService._check_duplicate_phone(db, user.phone)
-        suspicious_activity = await FraudDetectionService._check_suspicious_activity(db, user_id)
+        duplicate_photos = await FraudDetectionService._check_duplicate_photos(
+            db, user_id
+        )
+        duplicate_phone = await FraudDetectionService._check_duplicate_phone(
+            db, user.phone
+        )
+        suspicious_activity = await FraudDetectionService._check_suspicious_activity(
+            db, user_id
+        )
         bot_behavior = await FraudDetectionService._check_bot_behavior(db, user_id)
 
         # Calculate fraud score
@@ -57,12 +63,14 @@ class FraudDetectionService:
                 risk_level=risk_level,
                 fraud_score=fraud_score,
                 description=f"Automated fraud analysis detected risk score: {fraud_score}",
-                evidence=json.dumps({
-                    "duplicate_photos": duplicate_photos,
-                    "duplicate_phone": duplicate_phone,
-                    "suspicious_activity": suspicious_activity,
-                    "bot_behavior": bot_behavior,
-                }),
+                evidence=json.dumps(
+                    {
+                        "duplicate_photos": duplicate_photos,
+                        "duplicate_phone": duplicate_phone,
+                        "suspicious_activity": suspicious_activity,
+                        "bot_behavior": bot_behavior,
+                    }
+                ),
             )
             db.add(fraud_alert)
 
@@ -71,13 +79,15 @@ class FraudDetectionService:
             user_id=user_id,
             score_type=AIScoreType.FRAUD,
             score=fraud_score,
-            details=json.dumps({
-                "duplicate_photos": duplicate_photos,
-                "duplicate_phone": duplicate_phone,
-                "suspicious_activity": suspicious_activity,
-                "bot_behavior": bot_behavior,
-                "risk_level": risk_level.value,
-            }),
+            details=json.dumps(
+                {
+                    "duplicate_photos": duplicate_photos,
+                    "duplicate_phone": duplicate_phone,
+                    "suspicious_activity": suspicious_activity,
+                    "bot_behavior": bot_behavior,
+                    "risk_level": risk_level.value,
+                }
+            ),
             model_version="v1.0",
         )
         db.add(ai_score)
@@ -98,7 +108,9 @@ class FraudDetectionService:
         """Check if user's photos appear on other profiles."""
         # In production, use image hashing (pHash) or AI embeddings
         # For now, check file URL duplication
-        user_photos = await db.execute(select(Photo.file_url).where(Photo.user_id == user_id))
+        user_photos = await db.execute(
+            select(Photo.file_url).where(Photo.user_id == user_id)
+        )
         urls = [r[0] for r in user_photos.all()]
 
         if not urls:
@@ -148,7 +160,11 @@ class FraudDetectionService:
         hour_ago = datetime.now(timezone.utc) - timedelta(hours=1)
         result = await db.execute(
             select(ChatMessage.content, func.count(ChatMessage.id))
-            .where(and_(ChatMessage.sender_id == user_id, ChatMessage.created_at >= hour_ago))
+            .where(
+                and_(
+                    ChatMessage.sender_id == user_id, ChatMessage.created_at >= hour_ago
+                )
+            )
             .group_by(ChatMessage.content)
             .having(func.count(ChatMessage.id) > 10)
         )

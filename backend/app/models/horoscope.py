@@ -12,7 +12,12 @@ class Horoscope(Base):
     __tablename__ = "horoscopes"
 
     id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
-    user_id = Column(UUID(as_uuid=True), ForeignKey("users.id", ondelete="CASCADE"), unique=True, nullable=False)
+    user_id = Column(
+        UUID(as_uuid=True),
+        ForeignKey("users.id", ondelete="CASCADE"),
+        unique=True,
+        nullable=False,
+    )
 
     nakshatra = Column(String(100), nullable=True)
     rasi = Column(String(100), nullable=True)
@@ -23,7 +28,9 @@ class Horoscope(Base):
     horoscope_pdf_url = Column(Text, nullable=True)
     star = Column(String(100), nullable=True)
 
-    created_at = Column(DateTime(timezone=True), default=lambda: datetime.now(timezone.utc))
+    created_at = Column(
+        DateTime(timezone=True), default=lambda: datetime.now(timezone.utc)
+    )
     updated_at = Column(
         DateTime(timezone=True),
         default=lambda: datetime.now(timezone.utc),

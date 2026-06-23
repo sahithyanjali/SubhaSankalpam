@@ -6,9 +6,20 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.db.session import get_db
 from app.middleware.auth import get_current_active_user
-from app.models.subscription import Payment, PaymentStatus, SubscriptionPlan, UserSubscription
+from app.models.subscription import (
+    Payment,
+    PaymentStatus,
+    SubscriptionPlan,
+    UserSubscription,
+)
 from app.models.user import User
-from app.schemas.subscription import PaymentCreate, PaymentResponse, PlanResponse, SubscribeRequest, SubscriptionResponse
+from app.schemas.subscription import (
+    PaymentCreate,
+    PaymentResponse,
+    PlanResponse,
+    SubscribeRequest,
+    SubscriptionResponse,
+)
 
 router = APIRouter(prefix="/subscriptions", tags=["Subscriptions"])
 
@@ -17,7 +28,9 @@ router = APIRouter(prefix="/subscriptions", tags=["Subscriptions"])
 async def get_plans(db: AsyncSession = Depends(get_db)):
     """Get all available subscription plans: Free, Silver, Gold, Platinum."""
     result = await db.execute(
-        select(SubscriptionPlan).where(SubscriptionPlan.is_active.is_(True)).order_by(SubscriptionPlan.price)
+        select(SubscriptionPlan)
+        .where(SubscriptionPlan.is_active.is_(True))
+        .order_by(SubscriptionPlan.price)
     )
     return result.scalars().all()
 
@@ -44,7 +57,9 @@ async def subscribe(
     current_user: User = Depends(get_current_active_user),
 ):
     """Subscribe to a plan (Free/Silver/Gold/Platinum)."""
-    plan_result = await db.execute(select(SubscriptionPlan).where(SubscriptionPlan.id == data.plan_id))
+    plan_result = await db.execute(
+        select(SubscriptionPlan).where(SubscriptionPlan.id == data.plan_id)
+    )
     plan = plan_result.scalar_one_or_none()
     if not plan:
         raise HTTPException(status_code=404, detail="Plan not found")
@@ -77,7 +92,9 @@ async def subscribe(
     await db.refresh(subscription)
 
     # Eagerly load plan
-    plan_result = await db.execute(select(SubscriptionPlan).where(SubscriptionPlan.id == subscription.plan_id))
+    plan_result = await db.execute(
+        select(SubscriptionPlan).where(SubscriptionPlan.id == subscription.plan_id)
+    )
     subscription.plan = plan_result.scalar_one()
 
     return subscription

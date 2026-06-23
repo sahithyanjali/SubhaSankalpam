@@ -37,7 +37,9 @@ class FraudAlert(Base):
     __tablename__ = "fraud_alerts"
 
     id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
-    user_id = Column(UUID(as_uuid=True), ForeignKey("users.id", ondelete="CASCADE"), nullable=False)
+    user_id = Column(
+        UUID(as_uuid=True), ForeignKey("users.id", ondelete="CASCADE"), nullable=False
+    )
 
     fraud_type = Column(Enum(FraudType), nullable=False)
     risk_level = Column(Enum(RiskLevel), nullable=False)
@@ -49,7 +51,9 @@ class FraudAlert(Base):
     resolved_by = Column(UUID(as_uuid=True), nullable=True)
     resolved_at = Column(DateTime(timezone=True), nullable=True)
 
-    created_at = Column(DateTime(timezone=True), default=lambda: datetime.now(timezone.utc))
+    created_at = Column(
+        DateTime(timezone=True), default=lambda: datetime.now(timezone.utc)
+    )
     updated_at = Column(
         DateTime(timezone=True),
         default=lambda: datetime.now(timezone.utc),

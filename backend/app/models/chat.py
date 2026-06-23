@@ -25,27 +25,41 @@ class ChatRoom(Base):
     __tablename__ = "chat_rooms"
 
     id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
-    user1_id = Column(UUID(as_uuid=True), ForeignKey("users.id", ondelete="CASCADE"), nullable=False)
-    user2_id = Column(UUID(as_uuid=True), ForeignKey("users.id", ondelete="CASCADE"), nullable=False)
+    user1_id = Column(
+        UUID(as_uuid=True), ForeignKey("users.id", ondelete="CASCADE"), nullable=False
+    )
+    user2_id = Column(
+        UUID(as_uuid=True), ForeignKey("users.id", ondelete="CASCADE"), nullable=False
+    )
     status = Column(Enum(ChatRoomStatus), default=ChatRoomStatus.ACTIVE)
     match_id = Column(UUID(as_uuid=True), ForeignKey("matches.id"), nullable=True)
 
-    created_at = Column(DateTime(timezone=True), default=lambda: datetime.now(timezone.utc))
+    created_at = Column(
+        DateTime(timezone=True), default=lambda: datetime.now(timezone.utc)
+    )
     updated_at = Column(
         DateTime(timezone=True),
         default=lambda: datetime.now(timezone.utc),
         onupdate=lambda: datetime.now(timezone.utc),
     )
 
-    messages = relationship("ChatMessage", back_populates="room", cascade="all, delete-orphan")
+    messages = relationship(
+        "ChatMessage", back_populates="room", cascade="all, delete-orphan"
+    )
 
 
 class ChatMessage(Base):
     __tablename__ = "chat_messages"
 
     id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
-    room_id = Column(UUID(as_uuid=True), ForeignKey("chat_rooms.id", ondelete="CASCADE"), nullable=False)
-    sender_id = Column(UUID(as_uuid=True), ForeignKey("users.id", ondelete="CASCADE"), nullable=False)
+    room_id = Column(
+        UUID(as_uuid=True),
+        ForeignKey("chat_rooms.id", ondelete="CASCADE"),
+        nullable=False,
+    )
+    sender_id = Column(
+        UUID(as_uuid=True), ForeignKey("users.id", ondelete="CASCADE"), nullable=False
+    )
 
     content = Column(Text, nullable=False)
     message_type = Column(Enum(MessageType), default=MessageType.TEXT)
@@ -53,6 +67,8 @@ class ChatMessage(Base):
     is_moderated = Column(Boolean, default=False)
     moderation_flag = Column(Text, nullable=True)
 
-    created_at = Column(DateTime(timezone=True), default=lambda: datetime.now(timezone.utc))
+    created_at = Column(
+        DateTime(timezone=True), default=lambda: datetime.now(timezone.utc)
+    )
 
     room = relationship("ChatRoom", back_populates="messages")

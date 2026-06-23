@@ -1,6 +1,17 @@
 from fastapi import APIRouter
 
-from app.api.v1.endpoints import admin, ai, auth, chat, horoscope, matches, notifications, photos, profiles, subscriptions
+from app.api.v1.endpoints import (
+    admin,
+    ai,
+    auth,
+    chat,
+    horoscope,
+    matches,
+    notifications,
+    photos,
+    profiles,
+    subscriptions,
+)
 
 api_router = APIRouter()
 

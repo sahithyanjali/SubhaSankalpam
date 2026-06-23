@@ -21,6 +21,7 @@ limiter = Limiter(key_func=get_limiter_key)
 async def lifespan(app: FastAPI):
     # Startup
     import os
+
     os.makedirs(settings.UPLOAD_DIR, exist_ok=True)
     os.makedirs(settings.CHROMA_PERSIST_DIR, exist_ok=True)
     yield

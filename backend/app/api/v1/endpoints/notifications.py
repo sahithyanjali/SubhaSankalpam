@@ -61,7 +61,9 @@ async def mark_as_read(
     """Mark a notification as read."""
     await db.execute(
         update(Notification)
-        .where(Notification.id == notification_id, Notification.user_id == current_user.id)
+        .where(
+            Notification.id == notification_id, Notification.user_id == current_user.id
+        )
         .values(is_read=True)
     )
     await db.commit()

@@ -1,4 +1,5 @@
 """Test configuration and fixtures for SubhaSankalpam."""
+
 import asyncio
 from typing import AsyncGenerator
 

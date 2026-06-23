@@ -19,7 +19,9 @@ class OTPService:
 
         # Store OTP in Redis with expiry
         key = f"{OTPService.OTP_PREFIX}{phone}"
-        await redis_client.setex(key, timedelta(minutes=settings.OTP_EXPIRE_MINUTES), otp)
+        await redis_client.setex(
+            key, timedelta(minutes=settings.OTP_EXPIRE_MINUTES), otp
+        )
 
         # Reset attempts
         attempts_key = f"{OTPService.OTP_ATTEMPTS_PREFIX}{phone}"
@@ -49,7 +51,9 @@ class OTPService:
 
         if stored_otp != otp:
             await redis_client.incr(attempts_key)
-            await redis_client.expire(attempts_key, timedelta(minutes=settings.OTP_EXPIRE_MINUTES))
+            await redis_client.expire(
+                attempts_key, timedelta(minutes=settings.OTP_EXPIRE_MINUTES)
+            )
             return False
 
         # OTP verified - cleanup
