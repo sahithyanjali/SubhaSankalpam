@@ -100,6 +100,11 @@ async def respond_to_interest(
     if match.status != MatchStatus.PENDING:
         raise HTTPException(status_code=400, detail="Already responded")
 
+    if data.status not in (MatchStatus.ACCEPTED, MatchStatus.REJECTED):
+        raise HTTPException(
+            status_code=400, detail="Status must be 'accepted' or 'rejected'"
+        )
+
     match.status = data.status
     match.responded_at = datetime.now(timezone.utc)
     if data.rejection_reason:

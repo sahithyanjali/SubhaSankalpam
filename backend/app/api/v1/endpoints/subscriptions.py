@@ -47,6 +47,13 @@ async def get_my_subscription(
     subscription = result.scalar_one_or_none()
     if not subscription:
         raise HTTPException(status_code=404, detail="No active subscription")
+
+    # Eagerly load plan (lazy loading not supported in async SQLAlchemy)
+    plan_result = await db.execute(
+        select(SubscriptionPlan).where(SubscriptionPlan.id == subscription.plan_id)
+    )
+    subscription.plan = plan_result.scalar_one()
+
     return subscription
 
 

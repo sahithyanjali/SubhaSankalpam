@@ -49,6 +49,8 @@ async def register(request: RegisterRequest, db: AsyncSession = Depends(get_db))
         db, request.phone, request.profile_for
     )
 
+    if request.profile_for:
+        user.profile_for = request.profile_for
     if request.email:
         user.email = request.email
     if request.password:
