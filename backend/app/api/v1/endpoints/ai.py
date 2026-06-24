@@ -111,9 +111,7 @@ async def chat_with_assistant(
     current_user: User = Depends(get_current_active_user),
 ):
     """AI chat assistant: find matches, improve profile, explain compatibility, horoscope insights."""
-    return await chat_assistant_service.chat(
-        db, current_user.id, request.query, request.context
-    )
+    return await chat_assistant_service.chat(db, current_user.id, request.query, request.context)
 
 
 # --- Profile Improvement Suggestions ---

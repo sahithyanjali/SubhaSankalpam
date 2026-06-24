@@ -1,5 +1,6 @@
-from pydantic_settings import BaseSettings
 from typing import Optional
+
+from pydantic_settings import BaseSettings
 
 
 class Settings(BaseSettings):
@@ -11,12 +12,8 @@ class Settings(BaseSettings):
     CORS_ORIGINS: list[str] = ["http://localhost:3000", "http://localhost:8080"]
 
     # Database
-    DATABASE_URL: str = (
-        "postgresql+asyncpg://postgres:postgres@localhost:5432/subhasankalpam"
-    )
-    DATABASE_SYNC_URL: str = (
-        "postgresql://postgres:postgres@localhost:5432/subhasankalpam"
-    )
+    DATABASE_URL: str = "postgresql+asyncpg://postgres:postgres@localhost:5432/subhasankalpam"
+    DATABASE_SYNC_URL: str = "postgresql://postgres:postgres@localhost:5432/subhasankalpam"
 
     # Redis
     REDIS_URL: str = "redis://localhost:6379/0"

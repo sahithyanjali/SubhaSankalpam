@@ -20,9 +20,7 @@ from app.schemas.match import (
 router = APIRouter(prefix="/matches", tags=["Matches & Interests"])
 
 
-@router.post(
-    "/send-interest", response_model=MatchResponse, status_code=status.HTTP_201_CREATED
-)
+@router.post("/send-interest", response_model=MatchResponse, status_code=status.HTTP_201_CREATED)
 async def send_interest(
     data: SendInterest,
     db: AsyncSession = Depends(get_db),
@@ -89,9 +87,7 @@ async def respond_to_interest(
 ):
     """Accept or reject an interest request."""
     result = await db.execute(
-        select(Match).where(
-            and_(Match.id == match_id, Match.receiver_id == current_user.id)
-        )
+        select(Match).where(and_(Match.id == match_id, Match.receiver_id == current_user.id))
     )
     match = result.scalar_one_or_none()
     if not match:
@@ -99,6 +95,9 @@ async def respond_to_interest(
 
     if match.status != MatchStatus.PENDING:
         raise HTTPException(status_code=400, detail="Already responded")
+
+    if data.status not in (MatchStatus.ACCEPTED, MatchStatus.REJECTED):
+        raise HTTPException(status_code=400, detail="Status must be 'accepted' or 'rejected'")
 
     match.status = data.status
     match.responded_at = datetime.now(timezone.utc)
@@ -157,9 +156,7 @@ async def get_sent_interests(
     )
     matches = result.scalars().all()
 
-    return MatchListResponse(
-        matches=matches, total=total, page=page, page_size=page_size
-    )
+    return MatchListResponse(matches=matches, total=total, page=page, page_size=page_size)
 
 
 @router.get("/received", response_model=MatchListResponse)
@@ -184,6 +181,4 @@ async def get_received_interests(
     )
     matches = result.scalars().all()
 
-    return MatchListResponse(
-        matches=matches, total=total, page=page, page_size=page_size
-    )
+    return MatchListResponse(matches=matches, total=total, page=page, page_size=page_size)

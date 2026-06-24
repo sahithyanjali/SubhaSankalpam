@@ -12,14 +12,10 @@ from app.core.config import settings
 from app.db.session import Base, get_db
 from app.main import app
 
-TEST_DATABASE_URL = settings.DATABASE_URL.replace(
-    "/subhasankalpam", "/subhasankalpam_test"
-)
+TEST_DATABASE_URL = settings.DATABASE_URL.replace("/subhasankalpam", "/subhasankalpam_test")
 
 engine_test = create_async_engine(TEST_DATABASE_URL, echo=False)
-TestSessionLocal = async_sessionmaker(
-    engine_test, class_=AsyncSession, expire_on_commit=False
-)
+TestSessionLocal = async_sessionmaker(engine_test, class_=AsyncSession, expire_on_commit=False)
 
 
 @pytest.fixture(scope="session")

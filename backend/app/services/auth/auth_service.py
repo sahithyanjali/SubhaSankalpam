@@ -38,9 +38,7 @@ class AuthService:
         return user
 
     @staticmethod
-    async def login_with_email(
-        db: AsyncSession, email: str, password: str
-    ) -> Optional[User]:
+    async def login_with_email(db: AsyncSession, email: str, password: str) -> Optional[User]:
         result = await db.execute(select(User).where(User.email == email))
         user = result.scalar_one_or_none()
 
@@ -64,9 +62,7 @@ class AuthService:
         )
 
     @staticmethod
-    async def refresh_access_token(
-        db: AsyncSession, refresh_token: str
-    ) -> Optional[TokenResponse]:
+    async def refresh_access_token(db: AsyncSession, refresh_token: str) -> Optional[TokenResponse]:
         payload = verify_token(refresh_token, "refresh")
         if payload is None:
             return None

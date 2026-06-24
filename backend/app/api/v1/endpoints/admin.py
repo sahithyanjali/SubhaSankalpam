@@ -35,9 +35,7 @@ async def get_dashboard(
     """Admin dashboard: total users, verified, pending, active, revenue, fraud alerts."""
     total = (await db.execute(select(func.count(User.id)))).scalar()
     verified = (
-        await db.execute(
-            select(func.count(User.id)).where(User.verified_badge.is_(True))
-        )
+        await db.execute(select(func.count(User.id)).where(User.verified_badge.is_(True)))
     ).scalar()
     pending = (
         await db.execute(
@@ -47,9 +45,7 @@ async def get_dashboard(
         )
     ).scalar()
     active = (
-        await db.execute(
-            select(func.count(User.id)).where(User.status == UserStatus.ACTIVE)
-        )
+        await db.execute(select(func.count(User.id)).where(User.status == UserStatus.ACTIVE))
     ).scalar()
     revenue = (
         await db.execute(
@@ -60,9 +56,7 @@ async def get_dashboard(
     ).scalar()
     fraud_count = (
         await db.execute(
-            select(func.count(FraudAlert.id)).where(
-                FraudAlert.status == FraudAlertStatus.OPEN
-            )
+            select(func.count(FraudAlert.id)).where(FraudAlert.status == FraudAlertStatus.OPEN)
         )
     ).scalar()
 
@@ -232,14 +226,10 @@ async def list_users(
     if status_filter:
         query = query.where(User.status == UserStatus(status_filter))
 
-    total = (
-        await db.execute(select(func.count()).select_from(query.subquery()))
-    ).scalar()
+    total = (await db.execute(select(func.count()).select_from(query.subquery()))).scalar()
 
     result = await db.execute(
-        query.order_by(User.created_at.desc())
-        .offset((page - 1) * page_size)
-        .limit(page_size)
+        query.order_by(User.created_at.desc()).offset((page - 1) * page_size).limit(page_size)
     )
     users = result.scalars().all()
 
@@ -270,14 +260,10 @@ async def generate_report(
     if request.report_type == "user":
         total = (await db.execute(select(func.count(User.id)))).scalar()
         active = (
-            await db.execute(
-                select(func.count(User.id)).where(User.status == UserStatus.ACTIVE)
-            )
+            await db.execute(select(func.count(User.id)).where(User.status == UserStatus.ACTIVE))
         ).scalar()
         verified = (
-            await db.execute(
-                select(func.count(User.id)).where(User.verified_badge.is_(True))
-            )
+            await db.execute(select(func.count(User.id)).where(User.verified_badge.is_(True)))
         ).scalar()
         data = {
             "total_users": total,
@@ -295,9 +281,7 @@ async def generate_report(
         ).scalar()
         count = (
             await db.execute(
-                select(func.count(Payment.id)).where(
-                    Payment.status == PaymentStatus.COMPLETED
-                )
+                select(func.count(Payment.id)).where(Payment.status == PaymentStatus.COMPLETED)
             )
         ).scalar()
         data = {"total_revenue": float(total_rev), "total_transactions": count}
@@ -306,9 +290,7 @@ async def generate_report(
         total_alerts = (await db.execute(select(func.count(FraudAlert.id)))).scalar()
         open_alerts = (
             await db.execute(
-                select(func.count(FraudAlert.id)).where(
-                    FraudAlert.status == FraudAlertStatus.OPEN
-                )
+                select(func.count(FraudAlert.id)).where(FraudAlert.status == FraudAlertStatus.OPEN)
             )
         ).scalar()
         data = {"total_alerts": total_alerts, "open_alerts": open_alerts}

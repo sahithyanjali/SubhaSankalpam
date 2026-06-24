@@ -23,15 +23,9 @@ class FraudDetectionService:
             raise ValueError("User not found")
 
         # Run all detection checks
-        duplicate_photos = await FraudDetectionService._check_duplicate_photos(
-            db, user_id
-        )
-        duplicate_phone = await FraudDetectionService._check_duplicate_phone(
-            db, user.phone
-        )
-        suspicious_activity = await FraudDetectionService._check_suspicious_activity(
-            db, user_id
-        )
+        duplicate_photos = await FraudDetectionService._check_duplicate_photos(db, user_id)
+        duplicate_phone = await FraudDetectionService._check_duplicate_phone(db, user.phone)
+        suspicious_activity = await FraudDetectionService._check_suspicious_activity(db, user_id)
         bot_behavior = await FraudDetectionService._check_bot_behavior(db, user_id)
 
         # Calculate fraud score
@@ -108,9 +102,7 @@ class FraudDetectionService:
         """Check if user's photos appear on other profiles."""
         # In production, use image hashing (pHash) or AI embeddings
         # For now, check file URL duplication
-        user_photos = await db.execute(
-            select(Photo.file_url).where(Photo.user_id == user_id)
-        )
+        user_photos = await db.execute(select(Photo.file_url).where(Photo.user_id == user_id))
         urls = [r[0] for r in user_photos.all()]
 
         if not urls:
@@ -130,9 +122,7 @@ class FraudDetectionService:
     @staticmethod
     async def _check_duplicate_phone(db: AsyncSession, phone: str) -> bool:
         """Check if phone number is associated with multiple accounts."""
-        result = await db.execute(
-            select(func.count(User.id)).where(User.phone == phone)
-        )
+        result = await db.execute(select(func.count(User.id)).where(User.phone == phone))
         count = result.scalar()
         return count > 1
 
@@ -160,11 +150,7 @@ class FraudDetectionService:
         hour_ago = datetime.now(timezone.utc) - timedelta(hours=1)
         result = await db.execute(
             select(ChatMessage.content, func.count(ChatMessage.id))
-            .where(
-                and_(
-                    ChatMessage.sender_id == user_id, ChatMessage.created_at >= hour_ago
-                )
-            )
+            .where(and_(ChatMessage.sender_id == user_id, ChatMessage.created_at >= hour_ago))
             .group_by(ChatMessage.content)
             .having(func.count(ChatMessage.id) > 10)
         )

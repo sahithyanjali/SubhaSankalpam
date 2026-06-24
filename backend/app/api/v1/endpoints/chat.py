@@ -118,9 +118,7 @@ async def get_messages(
     # Verify user is in the room
     room_result = await db.execute(select(ChatRoom).where(ChatRoom.id == room_id))
     room = room_result.scalar_one_or_none()
-    if not room or (
-        room.user1_id != current_user.id and room.user2_id != current_user.id
-    ):
+    if not room or (room.user1_id != current_user.id and room.user2_id != current_user.id):
         raise HTTPException(status_code=403, detail="Access denied")
 
     # Mark messages as read
@@ -171,9 +169,7 @@ async def send_message(
     """Send a message in a chat room."""
     room_result = await db.execute(select(ChatRoom).where(ChatRoom.id == room_id))
     room = room_result.scalar_one_or_none()
-    if not room or (
-        room.user1_id != current_user.id and room.user2_id != current_user.id
-    ):
+    if not room or (room.user1_id != current_user.id and room.user2_id != current_user.id):
         raise HTTPException(status_code=403, detail="Access denied")
 
     if room.status != ChatRoomStatus.ACTIVE:
@@ -216,9 +212,7 @@ async def send_message(
 
 
 @router.websocket("/ws/{room_id}")
-async def websocket_endpoint(
-    websocket: WebSocket, room_id: str, token: str = Query(default="")
-):
+async def websocket_endpoint(websocket: WebSocket, room_id: str, token: str = Query(default="")):
     """WebSocket for real-time chat (requires token query param for auth)."""
     if not token:
         await websocket.close(code=4001, reason="Authentication required")

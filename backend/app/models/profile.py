@@ -126,15 +126,11 @@ class Profile(Base):
     languages = Column(Text, nullable=True)  # JSON array stored as text
 
     # Admin
-    approval_status = Column(
-        Enum(ProfileApprovalStatus), default=ProfileApprovalStatus.PENDING
-    )
+    approval_status = Column(Enum(ProfileApprovalStatus), default=ProfileApprovalStatus.PENDING)
     admin_notes = Column(Text, nullable=True)
     profile_completeness = Column(Integer, default=0)
 
-    created_at = Column(
-        DateTime(timezone=True), default=lambda: datetime.now(timezone.utc)
-    )
+    created_at = Column(DateTime(timezone=True), default=lambda: datetime.now(timezone.utc))
     updated_at = Column(
         DateTime(timezone=True),
         default=lambda: datetime.now(timezone.utc),
