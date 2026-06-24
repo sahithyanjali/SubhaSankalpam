@@ -25,15 +25,15 @@ dependencies:
   cached_network_image: ^3.4.1
   shimmer: ^3.0.0
   # Forms
-  flutter_form_builder: ^9.4.1
-  form_builder_validators: ^11.0.0
+  flutter_form_builder: ^10.3.0
+  form_builder_validators: ^11.1.0
   # Chat
   web_socket_channel: ^3.0.1
   # Image
   image_picker: ^1.1.2
   image_cropper: ^8.0.2
   # Utils
-  intl: ^0.19.0
+  intl: any
   url_launcher: ^6.3.0
   # Notifications
   firebase_messaging: ^15.1.3
