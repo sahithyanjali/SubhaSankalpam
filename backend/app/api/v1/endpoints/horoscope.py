@@ -23,15 +23,11 @@ async def create_horoscope(
     current_user: User = Depends(get_current_active_user),
 ):
     """Create horoscope details: Nakshatra, Rasi, Gothram, Dosham, Birth Time/Place."""
-    existing = await db.execute(
-        select(Horoscope).where(Horoscope.user_id == current_user.id)
-    )
+    existing = await db.execute(select(Horoscope).where(Horoscope.user_id == current_user.id))
     if existing.scalar_one_or_none():
         raise HTTPException(status_code=400, detail="Horoscope already exists")
 
-    horoscope = Horoscope(
-        user_id=current_user.id, **data.model_dump(exclude_unset=True)
-    )
+    horoscope = Horoscope(user_id=current_user.id, **data.model_dump(exclude_unset=True))
     db.add(horoscope)
     await db.commit()
     await db.refresh(horoscope)
@@ -44,9 +40,7 @@ async def get_my_horoscope(
     current_user: User = Depends(get_current_active_user),
 ):
     """Get current user's horoscope."""
-    result = await db.execute(
-        select(Horoscope).where(Horoscope.user_id == current_user.id)
-    )
+    result = await db.execute(select(Horoscope).where(Horoscope.user_id == current_user.id))
     horoscope = result.scalar_one_or_none()
     if not horoscope:
         raise HTTPException(status_code=404, detail="Horoscope not found")
@@ -60,9 +54,7 @@ async def update_horoscope(
     current_user: User = Depends(get_current_active_user),
 ):
     """Update horoscope details."""
-    result = await db.execute(
-        select(Horoscope).where(Horoscope.user_id == current_user.id)
-    )
+    result = await db.execute(select(Horoscope).where(Horoscope.user_id == current_user.id))
     horoscope = result.scalar_one_or_none()
     if not horoscope:
         raise HTTPException(status_code=404, detail="Horoscope not found")
@@ -95,9 +87,7 @@ async def upload_horoscope_pdf(
         f.write(content)
 
     # Update horoscope record
-    result = await db.execute(
-        select(Horoscope).where(Horoscope.user_id == current_user.id)
-    )
+    result = await db.execute(select(Horoscope).where(Horoscope.user_id == current_user.id))
     horoscope = result.scalar_one_or_none()
 
     if not horoscope:

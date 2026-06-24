@@ -34,18 +34,14 @@ class ChatRoom(Base):
     status = Column(Enum(ChatRoomStatus), default=ChatRoomStatus.ACTIVE)
     match_id = Column(UUID(as_uuid=True), ForeignKey("matches.id"), nullable=True)
 
-    created_at = Column(
-        DateTime(timezone=True), default=lambda: datetime.now(timezone.utc)
-    )
+    created_at = Column(DateTime(timezone=True), default=lambda: datetime.now(timezone.utc))
     updated_at = Column(
         DateTime(timezone=True),
         default=lambda: datetime.now(timezone.utc),
         onupdate=lambda: datetime.now(timezone.utc),
     )
 
-    messages = relationship(
-        "ChatMessage", back_populates="room", cascade="all, delete-orphan"
-    )
+    messages = relationship("ChatMessage", back_populates="room", cascade="all, delete-orphan")
 
 
 class ChatMessage(Base):
@@ -67,8 +63,6 @@ class ChatMessage(Base):
     is_moderated = Column(Boolean, default=False)
     moderation_flag = Column(Text, nullable=True)
 
-    created_at = Column(
-        DateTime(timezone=True), default=lambda: datetime.now(timezone.utc)
-    )
+    created_at = Column(DateTime(timezone=True), default=lambda: datetime.now(timezone.utc))
 
     room = relationship("ChatRoom", back_populates="messages")

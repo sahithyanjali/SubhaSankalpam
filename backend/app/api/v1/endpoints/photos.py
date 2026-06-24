@@ -24,9 +24,7 @@ async def upload_photo(
 ):
     """Upload profile, gallery, family, or selfie photo."""
     if file.content_type not in settings.ALLOWED_PHOTO_TYPES:
-        raise HTTPException(
-            status_code=400, detail="Invalid file type. Use JPEG, PNG, or WebP"
-        )
+        raise HTTPException(status_code=400, detail="Invalid file type. Use JPEG, PNG, or WebP")
 
     content = await file.read()
     if len(content) > settings.MAX_PHOTO_SIZE_MB * 1024 * 1024:
@@ -45,9 +43,7 @@ async def upload_photo(
 
     # Determine if primary
     existing = await db.execute(
-        select(Photo).where(
-            Photo.user_id == current_user.id, Photo.photo_type == PhotoType.PROFILE
-        )
+        select(Photo).where(Photo.user_id == current_user.id, Photo.photo_type == PhotoType.PROFILE)
     )
     is_primary = photo_type == "profile" and existing.scalar_one_or_none() is None
 
@@ -75,9 +71,7 @@ async def get_my_photos(
 ):
     """Get all photos for current user."""
     result = await db.execute(
-        select(Photo)
-        .where(Photo.user_id == current_user.id)
-        .order_by(Photo.display_order)
+        select(Photo).where(Photo.user_id == current_user.id).order_by(Photo.display_order)
     )
     photos = result.scalars().all()
     return {

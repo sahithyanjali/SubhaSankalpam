@@ -17,9 +17,7 @@ class VerificationService:
 
     @staticmethod
     async def verify_profile(db: AsyncSession, user_id: UUID) -> VerificationResult:
-        result = await db.execute(
-            select(Verification).where(Verification.user_id == user_id)
-        )
+        result = await db.execute(select(Verification).where(Verification.user_id == user_id))
         verification = result.scalar_one_or_none()
 
         if verification is None:
@@ -43,9 +41,7 @@ class VerificationService:
         verification.trust_score = trust_score
         verification.identity_consistency = identity_consistency
         verification.verification_status = (
-            VerificationStatus.VERIFIED
-            if is_verified
-            else VerificationStatus.MANUAL_REVIEW
+            VerificationStatus.VERIFIED if is_verified else VerificationStatus.MANUAL_REVIEW
         )
 
         # Update user verified badge
@@ -81,9 +77,7 @@ class VerificationService:
         )
 
     @staticmethod
-    async def _compare_faces(
-        selfie_url: Optional[str], profile_photo_url: Optional[str]
-    ) -> float:
+    async def _compare_faces(selfie_url: Optional[str], profile_photo_url: Optional[str]) -> float:
         """Compare selfie with profile photo using AI."""
         if not selfie_url or not profile_photo_url:
             return 0.0
@@ -121,9 +115,7 @@ class VerificationService:
         score = 50.0  # Base score
 
         # Check profile completeness
-        profile_result = await db.execute(
-            select(Profile).where(Profile.user_id == user_id)
-        )
+        profile_result = await db.execute(select(Profile).where(Profile.user_id == user_id))
         profile = profile_result.scalar_one_or_none()
         if profile:
             if profile.education:

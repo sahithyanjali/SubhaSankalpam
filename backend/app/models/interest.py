@@ -38,9 +38,7 @@ class UserInterest(Base):
     __tablename__ = "user_interests"
 
     id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
-    user_id = Column(
-        UUID(as_uuid=True), ForeignKey("users.id", ondelete="CASCADE"), nullable=False
-    )
+    user_id = Column(UUID(as_uuid=True), ForeignKey("users.id", ondelete="CASCADE"), nullable=False)
     interest_id = Column(
         UUID(as_uuid=True),
         ForeignKey("interests.id", ondelete="CASCADE"),
@@ -48,9 +46,7 @@ class UserInterest(Base):
     )
     details = Column(String(255), nullable=True)
 
-    created_at = Column(
-        DateTime(timezone=True), default=lambda: datetime.now(timezone.utc)
-    )
+    created_at = Column(DateTime(timezone=True), default=lambda: datetime.now(timezone.utc))
 
     user = relationship("User", back_populates="user_interests")
     interest = relationship("Interest", back_populates="user_interests")

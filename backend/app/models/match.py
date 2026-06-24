@@ -41,15 +41,9 @@ class Match(Base):
     message = Column(Text, nullable=True)
     rejection_reason = Column(Text, nullable=True)
 
-    sent_at = Column(
-        DateTime(timezone=True), default=lambda: datetime.now(timezone.utc)
-    )
+    sent_at = Column(DateTime(timezone=True), default=lambda: datetime.now(timezone.utc))
     responded_at = Column(DateTime(timezone=True), nullable=True)
     expires_at = Column(DateTime(timezone=True), nullable=True)
 
-    sender = relationship(
-        "User", foreign_keys=[sender_id], back_populates="sent_matches"
-    )
-    receiver = relationship(
-        "User", foreign_keys=[receiver_id], back_populates="received_matches"
-    )
+    sender = relationship("User", foreign_keys=[sender_id], back_populates="sent_matches")
+    receiver = relationship("User", foreign_keys=[receiver_id], back_populates="received_matches")

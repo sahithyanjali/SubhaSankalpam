@@ -22,56 +22,40 @@ class RecommendationService:
     async def get_daily_matches(
         db: AsyncSession, user_id: UUID, limit: int = 5
     ) -> MatchRecommendationList:
-        return await RecommendationService._get_recommendations(
-            db, user_id, limit, "daily"
-        )
+        return await RecommendationService._get_recommendations(db, user_id, limit, "daily")
 
     @staticmethod
     async def get_weekly_matches(
         db: AsyncSession, user_id: UUID, limit: int = 20
     ) -> MatchRecommendationList:
-        return await RecommendationService._get_recommendations(
-            db, user_id, limit, "weekly"
-        )
+        return await RecommendationService._get_recommendations(db, user_id, limit, "weekly")
 
     @staticmethod
     async def get_similar_profiles(
         db: AsyncSession, user_id: UUID, limit: int = 10
     ) -> MatchRecommendationList:
-        return await RecommendationService._get_recommendations(
-            db, user_id, limit, "similar"
-        )
+        return await RecommendationService._get_recommendations(db, user_id, limit, "similar")
 
     @staticmethod
     async def _get_recommendations(
         db: AsyncSession, user_id: UUID, limit: int, rec_type: str
     ) -> MatchRecommendationList:
         # Get current user's profile
-        profile_result = await db.execute(
-            select(Profile).where(Profile.user_id == user_id)
-        )
+        profile_result = await db.execute(select(Profile).where(Profile.user_id == user_id))
         user_profile = profile_result.scalar_one_or_none()
 
         if not user_profile:
-            return MatchRecommendationList(
-                recommendations=[], recommendation_type=rec_type
-            )
+            return MatchRecommendationList(recommendations=[], recommendation_type=rec_type)
 
         # Determine target gender
-        target_gender = (
-            Gender.FEMALE if user_profile.gender == Gender.MALE else Gender.MALE
-        )
+        target_gender = Gender.FEMALE if user_profile.gender == Gender.MALE else Gender.MALE
 
         # Get existing match IDs to exclude
-        sent_result = await db.execute(
-            select(Match.receiver_id).where(Match.sender_id == user_id)
-        )
+        sent_result = await db.execute(select(Match.receiver_id).where(Match.sender_id == user_id))
         received_result = await db.execute(
             select(Match.sender_id).where(Match.receiver_id == user_id)
         )
-        excluded_ids = {r[0] for r in sent_result.all()} | {
-            r[0] for r in received_result.all()
-        }
+        excluded_ids = {r[0] for r in sent_result.all()} | {r[0] for r in received_result.all()}
         excluded_ids.add(user_id)
 
         # Find candidate profiles
@@ -129,9 +113,7 @@ class RecommendationService:
         )
 
     @staticmethod
-    def _generate_match_reason(
-        user_profile: Profile, candidate: Profile, score: float
-    ) -> str:
+    def _generate_match_reason(user_profile: Profile, candidate: Profile, score: float) -> str:
         reasons = []
         if (
             user_profile.religion
@@ -139,17 +121,9 @@ class RecommendationService:
             and user_profile.religion == candidate.religion
         ):
             reasons.append("Same religion")
-        if (
-            user_profile.caste
-            and candidate.caste
-            and user_profile.caste == candidate.caste
-        ):
+        if user_profile.caste and candidate.caste and user_profile.caste == candidate.caste:
             reasons.append("Same caste")
-        if (
-            user_profile.state
-            and candidate.state
-            and user_profile.state == candidate.state
-        ):
+        if user_profile.state and candidate.state and user_profile.state == candidate.state:
             reasons.append("Same state")
         if user_profile.city and candidate.city and user_profile.city == candidate.city:
             reasons.append("Same city")

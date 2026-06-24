@@ -28,9 +28,7 @@ class Horoscope(Base):
     horoscope_pdf_url = Column(Text, nullable=True)
     star = Column(String(100), nullable=True)
 
-    created_at = Column(
-        DateTime(timezone=True), default=lambda: datetime.now(timezone.utc)
-    )
+    created_at = Column(DateTime(timezone=True), default=lambda: datetime.now(timezone.utc))
     updated_at = Column(
         DateTime(timezone=True),
         default=lambda: datetime.now(timezone.utc),

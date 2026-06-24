@@ -58,19 +58,11 @@ class CompatibilityService:
 
         # Calculate individual scores
         age_score = CompatibilityService._age_compatibility(profile1, profile2)
-        education_score = CompatibilityService._education_compatibility(
-            profile1, profile2
-        )
-        location_score = CompatibilityService._location_compatibility(
-            profile1, profile2
-        )
-        religion_score = CompatibilityService._religion_compatibility(
-            profile1, profile2
-        )
+        education_score = CompatibilityService._education_compatibility(profile1, profile2)
+        location_score = CompatibilityService._location_compatibility(profile1, profile2)
+        religion_score = CompatibilityService._religion_compatibility(profile1, profile2)
         caste_score = CompatibilityService._caste_compatibility(profile1, profile2)
-        lifestyle_score = CompatibilityService._lifestyle_compatibility(
-            profile1, profile2
-        )
+        lifestyle_score = CompatibilityService._lifestyle_compatibility(profile1, profile2)
         interests_score = await CompatibilityService._interests_compatibility(
             db, user1_id, user2_id
         )
@@ -236,11 +228,7 @@ class CompatibilityService:
             return 50.0
         if p1.caste.lower() == p2.caste.lower():
             score = 90.0
-            if (
-                p1.sub_caste
-                and p2.sub_caste
-                and p1.sub_caste.lower() == p2.sub_caste.lower()
-            ):
+            if p1.sub_caste and p2.sub_caste and p1.sub_caste.lower() == p2.sub_caste.lower():
                 score = 100.0
             return score
         if p1.willing_intercaste or p2.willing_intercaste:
@@ -274,15 +262,9 @@ class CompatibilityService:
         return score
 
     @staticmethod
-    async def _interests_compatibility(
-        db: AsyncSession, user1_id: UUID, user2_id: UUID
-    ) -> float:
-        r1 = await db.execute(
-            select(UserInterest).where(UserInterest.user_id == user1_id)
-        )
-        r2 = await db.execute(
-            select(UserInterest).where(UserInterest.user_id == user2_id)
-        )
+    async def _interests_compatibility(db: AsyncSession, user1_id: UUID, user2_id: UUID) -> float:
+        r1 = await db.execute(select(UserInterest).where(UserInterest.user_id == user1_id))
+        r2 = await db.execute(select(UserInterest).where(UserInterest.user_id == user2_id))
         interests1 = {ui.interest_id for ui in r1.scalars().all()}
         interests2 = {ui.interest_id for ui in r2.scalars().all()}
 
@@ -298,15 +280,9 @@ class CompatibilityService:
         return (len(common) / len(total)) * 100
 
     @staticmethod
-    async def _horoscope_compatibility(
-        db: AsyncSession, user1_id: UUID, user2_id: UUID
-    ) -> float:
-        h1_result = await db.execute(
-            select(Horoscope).where(Horoscope.user_id == user1_id)
-        )
-        h2_result = await db.execute(
-            select(Horoscope).where(Horoscope.user_id == user2_id)
-        )
+    async def _horoscope_compatibility(db: AsyncSession, user1_id: UUID, user2_id: UUID) -> float:
+        h1_result = await db.execute(select(Horoscope).where(Horoscope.user_id == user1_id))
+        h2_result = await db.execute(select(Horoscope).where(Horoscope.user_id == user2_id))
         h1 = h1_result.scalar_one_or_none()
         h2 = h2_result.scalar_one_or_none()
 
@@ -317,9 +293,7 @@ class CompatibilityService:
 
         # Rasi compatibility
         if h1.rasi and h2.rasi:
-            rasi_score = CompatibilityService.RASI_COMPATIBILITY.get(
-                (h1.rasi, h2.rasi), 50
-            )
+            rasi_score = CompatibilityService.RASI_COMPATIBILITY.get((h1.rasi, h2.rasi), 50)
             score = rasi_score
 
         # Dosham compatibility

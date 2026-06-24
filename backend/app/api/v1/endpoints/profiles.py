@@ -27,9 +27,7 @@ async def create_profile(
     current_user: User = Depends(get_current_active_user),
 ):
     """Create user profile with personal, professional, and lifestyle details."""
-    existing = await db.execute(
-        select(Profile).where(Profile.user_id == current_user.id)
-    )
+    existing = await db.execute(select(Profile).where(Profile.user_id == current_user.id))
     if existing.scalar_one_or_none():
         raise HTTPException(status_code=400, detail="Profile already exists")
 

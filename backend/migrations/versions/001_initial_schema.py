@@ -6,8 +6,8 @@ Create Date: 2024-06-23
 
 """
 
-from alembic import op
 import sqlalchemy as sa
+from alembic import op
 from sqlalchemy.dialects.postgresql import UUID
 
 revision = "001_initial"
@@ -32,9 +32,7 @@ def upgrade() -> None:
         ),
         sa.Column(
             "status",
-            sa.Enum(
-                "active", "inactive", "suspended", "pending", "deleted", name="userstatus"
-            ),
+            sa.Enum("active", "inactive", "suspended", "pending", "deleted", name="userstatus"),
             nullable=False,
             server_default="pending",
         ),
@@ -136,9 +134,7 @@ def upgrade() -> None:
         sa.Column("family_type", sa.String(50), nullable=True),
         sa.Column(
             "eating_habit",
-            sa.Enum(
-                "vegetarian", "non_vegetarian", "eggetarian", "vegan", name="eatinghabit"
-            ),
+            sa.Enum("vegetarian", "non_vegetarian", "eggetarian", "vegan", name="eatinghabit"),
             nullable=True,
         ),
         sa.Column(
@@ -479,9 +475,7 @@ def upgrade() -> None:
             sa.Enum("active", "blocked", "closed", name="chatroomstatus"),
             server_default="active",
         ),
-        sa.Column(
-            "match_id", UUID(as_uuid=True), sa.ForeignKey("matches.id"), nullable=True
-        ),
+        sa.Column("match_id", UUID(as_uuid=True), sa.ForeignKey("matches.id"), nullable=True),
         sa.Column(
             "created_at",
             sa.DateTime(timezone=True),

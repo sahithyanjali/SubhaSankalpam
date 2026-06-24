@@ -6,10 +6,11 @@ Create Date: 2024-06-23
 
 """
 
-from alembic import op
-import sqlalchemy as sa
-from sqlalchemy.dialects.postgresql import UUID
 import uuid
+
+import sqlalchemy as sa
+from alembic import op
+from sqlalchemy.dialects.postgresql import UUID
 
 revision = "002_seed_data"
 down_revision = "001_initial"
